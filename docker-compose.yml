@@ -1,0 +1,114 @@
+version: "3"
+services:
+  geth-bootnode:
+    hostname: geth-bootnode
+    environment: 
+      - nodekeyhex=08f0e1dee5c1b4645f3331a566009e41a4514b6cd28656d63d0449ecf812812b #Needs to be fix, so that the miners know the resulting enode id
+    build:
+      context: ./bootnode
+    ports: 
+      - 30301:30301/udp
+    networks:
+      chainnet: 
+        ipv4_address: 172.25.0.101 # The miners need to know the IP address later on
+
+  geth-dev-miner-1:
+    hostname: geth-dev-miner-1
+    depends_on: 
+      - geth-bootnode
+    environment:
+      - address=0x4decb0a47f7ed0f7ed88a4ca62a55c6f040cf5b7 #derived from the private key which is passed in the args
+      - bootnodeId=76a8171707eca17647a47ca99ffd348927dfa60102792ea349a25d5192e61855be83b786e376276a306afcceea4ffd1c9c77e4370b417efc39f328a0d068004c #derived from the nodekeyhex of the bootnode
+      - bootnodeIp=172.25.0.101  
+    build: 
+      context: ./miner
+      args:
+        privatekey: cbb3a7433980d135e4311d69ec3a28eb34b6680d9af9eda83bc631c9e7ee58e8
+        password: pass
+    container_name: geth-miner-1
+    ports:
+      - 8545:8545
+    volumes:
+      - eth-data-1:/root/.ethash
+    networks:
+      chainnet:
+        ipv4_address: 172.25.0.102 # The monitor needs to know this address
+
+  geth-dev-miner-2:
+    hostname: geth-dev-miner-2
+    depends_on: 
+      - geth-bootnode
+    environment:
+      - address=0x1e28b4fc0eaf60773050e17063a09f97737ae6a9 #derived from the private key which is passed in the args
+      - bootnodeId=76a8171707eca17647a47ca99ffd348927dfa60102792ea349a25d5192e61855be83b786e376276a306afcceea4ffd1c9c77e4370b417efc39f328a0d068004c #derived from the nodekeyhex of the bootnode
+      - bootnodeIp=172.25.0.101
+    build: 
+      context: ./miner
+      args:
+        privatekey: 4df9741e7584b2e2d55a0a3acc3853c49aaa92f2e71877e95cff0c06ab5bbc95
+        password: word
+    container_name: geth-miner-2
+    ports:
+      - 8546:8545
+    volumes:
+     - eth-data-2:/root/.ethash
+    networks:
+      chainnet:
+        ipv4_address: 172.25.0.104
+
+  geth-dev-miner-3:
+     hostname: geth-dev-miner-3
+     depends_on: 
+       - geth-bootnode
+     environment:
+       - address=0x1e28b4fc0eaf60773050e17063a09f97737ae6a9 #derived from the private key which is passed in the args
+       - bootnodeId=76a8171707eca17647a47ca99ffd348927dfa60102792ea349a25d5192e61855be83b786e376276a306afcceea4ffd1c9c77e4370b417efc39f328a0d068004c #derived from the nodekeyhex of the bootnode
+       - bootnodeIp=172.25.0.101
+     build:
+       context: ./node
+       args:
+         privatekey: 4df9741e7584b2e2d55a0a3acc3853c49aaa92f2e71877e95cff0c06ab5bbc95
+         password: word
+     container_name: geth-miner-3
+     ports:
+       - 8547:8545
+     volumes:
+      - eth-data-3:/root/.ethash
+     networks:
+       chainnet:
+         ipv4_address: 172.25.0.110
+
+  geth-monitor-backend:
+    hostname: geth-monitor-backend
+    depends_on: 
+      - geth-dev-miner-1
+    build:
+      context: ./monitor-backend
+    container_name: monitor-backend
+    networks:
+      chainnet:
+
+  geth-monitor-frontend:
+   hostname: geth-monitor-frontend
+   depends_on: 
+     - geth-monitor-backend
+   build:
+     context: ./monitor-frontend
+   container_name: monitor-frontend
+   ports:
+    - 3000:3000
+   networks:
+    chainnet:
+      ipv4_address: 172.25.0.103
+
+networks:
+  chainnet:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.25.0.0/24
+
+volumes:
+  eth-data-1:
+  eth-data-2:
+  eth-data-3:
