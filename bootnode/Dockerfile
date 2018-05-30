@@ -13,7 +13,7 @@ RUN tar -xzvf $BINARY --strip 1
 RUN rm $BINARY
 
 ENV nodekeyhex=""
-CMD exec ./bootnode -nodekeyhex $nodekeyhex
+CMD exec ./bootnode -nodekey $nodekeyhex -verbosity 9 -addr :30301
 
 EXPOSE 30301/udp
 EXPOSE 30303/udp
