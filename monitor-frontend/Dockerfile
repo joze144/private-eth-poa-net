@@ -1,6 +1,6 @@
 FROM ubuntu:xenial
 
-MAINTAINER Jozhe <jozhe@energo.cn>
+MAINTAINER Tim Zöller <mail@tim-zoeller.de>
 
 RUN apt-get update \
       && apt-get install -y wget nodejs npm ntp git\

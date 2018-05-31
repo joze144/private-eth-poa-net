@@ -17,14 +17,14 @@ RUN ./geth init genesis.json
 
 ARG password
 ARG privatekey
-RUN echo $password > ~/.accountpassword
+RUN echo $password > ~/.password
 RUN echo $privatekey > ~/.privatekey
-RUN ./geth account import --password ~/.accountpassword  ~/.privatekey
+RUN ./geth account import --password ~/.password  ~/.privatekey
 
 ENV address=""
 ENV bootnodeId=""
 ENV bootnodeIp=""
-CMD exec ./geth --bootnodes "enode://$bootnodeId@$bootnodeIp:30301" --networkid="1001" --verbosity=4 --rpc --rpcaddr "0.0.0.0" --rpccorsdomain "*" --mine --etherbase $address --unlock $address --password ~/.accountpassword
+CMD exec ./geth --syncmode 'full' --port 30313 --rpc --rpcaddr '0.0.0.0' --rpcport 8503 --rpcapi 'personal,db,eth,net,web3,txpool,miner' --bootnodes "enode://$bootnodeId@$bootnodeIp:30311" --networkid="1005" --gasprice '1' -unlock $address --password ~/.password --mine
 
-EXPOSE 8545
-EXPOSE 30303
+EXPOSE 8503
+EXPOSE 30313

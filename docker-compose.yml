@@ -3,11 +3,11 @@ services:
   geth-bootnode:
     hostname: geth-bootnode
     environment: 
-      - nodekeyhex=5156e422cf67e42e50fd4f8bb64912ea818a314785ef9379f0f88aeff4c18ea2 #Needs to be fix, so that the miners know the resulting enode id
+      - nodekeyhex=5dcc3dae734171aa441608400c787467574c82a4aaac1ed3f3850ed622562aa4 #Needs to be fix, so that the miners know the resulting enode id
     build:
       context: ./bootnode
     ports: 
-      - 30301:30301/udp
+      - 30311:30311/udp
     networks:
       chainnet: 
         ipv4_address: 172.25.0.101 # The miners need to know the IP address later on
@@ -17,17 +17,18 @@ services:
     depends_on: 
       - geth-bootnode
     environment:
-      - address=0x52849c164f1306d13c807bf19a15821bd12659fc #derived from the private key which is passed in the args
-      - bootnodeId=e967d6c4d944e8a6a23d4072df87d2a8a29bee8f0dcf1372c80247a30991d03e8860fb59b7e7656f522faad59afcf48f3769d13320e2f889174f9841c1155cd7 #derived from the nodekeyhex of the bootnode
+      - address=0x7bd20cf7a890c8eac5134d834a47787a6f563fe1
+      - bootnodeId=e41477450d4e6ba6c30a3d818529f4cc086d82778ed1c831bccc5cb984c09a3ad41c7c36bfa9717a63c61cbb60d0bb37d74a9672c7ec1e9e32e691612c055b38
       - bootnodeIp=172.25.0.101  
     build: 
-      context: ./miner
+      context: ./node1
       args:
-        privatekey: ee6829c8f42994926675b22d255449fc07e75dfc8cedf469cc88a4bad27bd2c7 # Please don't do something like this in production, okay?
-        password: Karamela15##
+        password: karamela
+        privatekey: 85dfcdbe1933a432f6704c8f86f125569c006d8094e723de3cd02dd41446dd26
     container_name: geth-miner-1
     ports:
-      - 8545:8545
+      - 8502:8502
+      - 30312:30312/udp
     volumes:
       - eth-data-1:/root/.ethash
     networks:
@@ -39,44 +40,23 @@ services:
     depends_on: 
       - geth-bootnode
     environment:
-      - address=0x97f66385c698f0de48888c4b2c614ffc906ddc3f #derived from the private key which is passed in the args
-      - bootnodeId=e967d6c4d944e8a6a23d4072df87d2a8a29bee8f0dcf1372c80247a30991d03e8860fb59b7e7656f522faad59afcf48f3769d13320e2f889174f9841c1155cd7 #derived from the nodekeyhex of the bootnode
-      - bootnodeIp=172.25.0.101
+      - address=0xe36fdefdbba9776c5df2e569ff8cc0dc0fa4b83c #derived from the private key which is passed in the args
+      - bootnodeId=e41477450d4e6ba6c30a3d818529f4cc086d82778ed1c831bccc5cb984c09a3ad41c7c36bfa9717a63c61cbb60d0bb37d74a9672c7ec1e9e32e691612c055b38
+      - bootnodeIp=172.25.0.101  
     build: 
-      context: ./miner
+      context: ./node2
       args:
-        privatekey: 59f04a1598ccab45c5e2aa8ddcadc53bc87d459e66c39dc3b769a4343ca4afe2
-        password: Karamela15##
+        password: karamela
+        privatekey: 5ed3e2954a0175ad7b8aaee5f37df3d1efe08cee93e379b15a1078d7ec913ccc
     container_name: geth-miner-2
     ports:
-      - 8546:8545
+      - 8503:8503
+      - 30313:30313/udp
     volumes:
      - eth-data-2:/root/.ethash
     networks:
       chainnet:
-        ipv4_address: 172.25.0.104
-
-  geth-dev-miner-3:
-     hostname: geth-dev-miner-3
-     depends_on: 
-       - geth-bootnode
-     environment:
-       - address=0x14d506982a656ef384ab5cb903369c62f9cf3c04 #derived from the private key which is passed in the args
-       - bootnodeId=e967d6c4d944e8a6a23d4072df87d2a8a29bee8f0dcf1372c80247a30991d03e8860fb59b7e7656f522faad59afcf48f3769d13320e2f889174f9841c1155cd7 #derived from the nodekeyhex of the bootnode
-       - bootnodeIp=172.25.0.101
-     build:
-       context: ./node
-       args:
-         privatekey: 8137fd410c88f55dc0da85386b2b79a5ed8676dc1d6d46310847b7154498ddeb
-         password: Karamela15##
-     container_name: geth-miner-3
-     ports:
-       - 8547:8545
-     volumes:
-      - eth-data-3:/root/.ethash
-     networks:
-       chainnet:
-         ipv4_address: 172.25.0.110
+        ipv4_address: 172.25.0.103
 
   geth-monitor-backend:
     hostname: geth-monitor-backend
@@ -99,7 +79,7 @@ services:
     - 3000:3000
    networks:
     chainnet:
-      ipv4_address: 172.25.0.103
+      ipv4_address: 172.25.0.104
 
 networks:
   chainnet:
@@ -111,4 +91,4 @@ networks:
 volumes:
   eth-data-1:
   eth-data-2:
-  eth-data-3:
+#   eth-data-3:
