@@ -1,7 +1,7 @@
 # Local Ethereum Network
 A set of Docker images to create a local Ethereum network with two mining nodes, bootnode and a monitor. They use Clique protocol (Proof of Authority) consensus mechanism and don't require any computation power for it. Computation power is only needed for the transactions, therefor it runs very efficiently.
 
-Block time is set to 15s, and gasPrice is set to 1 on the mining nodes.
+Block time is set to 8s, and gasPrice is set to 1 on the mining nodes.
 
 ## Usage
 Setting up this networks requires you to install Docker. Clone the repository, and run `docker-compose up -d --build` from the repository root. The network should start and synchronize without any further configuration.
